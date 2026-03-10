@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Title</title>
+        <style>
+        
+        .builder{
+    display:flex;
+    gap:20px;
+}
+
+.field-list{
+    width:200px;
+    border:1px solid #ccc;
+    padding:10px;
+}
+
+.field-item{
+    padding:10px;
+    border:1px solid #999;
+    margin-bottom:8px;
+    cursor:grab;
+    background:#fafafa;
+}
+
+#form-canvas{
+    flex:1;
+    min-height:400px;
+    border:2px dashed #aaa;
+    padding:15px;
+}
+
+.form-field{
+    border:1px solid #ddd;
+    padding:15px;
+    margin-bottom:10px;
+    background:white;
+}
+        
+        </style>
+    </head>
+    <body>
+<div class="builder">
+
+    <div class="field-list">
+
+        <div class="field-item" data-type="text">Text</div>
+        <div class="field-item" data-type="textarea">Paragraph</div>
+        <div class="field-item" data-type="radio">Multiple Choice</div>
+        <div class="field-item" data-type="checkbox">Checkbox</div>
+        <div class="field-item" data-type="select">Dropdown</div>
+
+    </div>
+
+    <div id="form-canvas"></div>
+
+</div>
+
+<button onclick="console.table(getFormStructure())">
+Show Form Structure
+</button>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <script>
+// FIELD COUNTER
+let fieldCounter = 0;
+
+// TOOLBOX (LEFT SIDE)
+new Sortable(document.querySelector('.field-list'), {
+    group:{
+        name:'formbuilder',
+        pull:'clone',
+        put:false
+    },
+    sort:false
+});
+
+
+// CANVAS (FORM AREA)
+new Sortable(document.getElementById('form-canvas'), {
+
+    group:'formbuilder',
+    animation:150,
+
+    onAdd:function(evt){
+
+        let type = evt.item.dataset.type;
+
+        fieldCounter++;
+
+        evt.item.classList.add('form-field');
+
+        evt.item.dataset.id = "field_" + fieldCounter;
+        evt.item.dataset.type = type;
+
+        evt.item.innerHTML = generateField(type);
+
+        updatePositions();
+
+        // LOG CREATED FIELD
+        console.log("Field Added:", {
+            id: evt.item.dataset.id,
+            type: type
+        });
+
+        // LOG FULL STRUCTURE
+        console.log("Current Form Structure:", getFormStructure());
+
+    },
+
+    onSort:function(){
+
+        updatePositions();
+
+        // LOG AFTER REORDER
+        console.log("Fields Reordered:");
+        console.log(getFormStructure());
+
+    }
+
+});
+    </script>
+    
+    </body>
+</html>
